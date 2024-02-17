@@ -39,13 +39,36 @@ while (true) {
         unset($changed[$found_socket]);
     }
 
+    broadcast_player_locations();
+
     foreach ($changed as $changed_socket) {
         while (socket_recv($changed_socket, $buf, 1024, 0) >= 1) {
+
             $received_text = unmask($buf);
             $received_data = json_decode($received_text);
+
+            print($received_data->type);
+
             if ($received_data === null)
                 continue;
             switch ($received_data->type) {
+
+
+                case "register":
+                    try {
+                        $username = $received_data->username;
+                        $password = $received_data->password;
+                        $player = new Player($db, $username, $password);
+                        $player->register($username, $password);
+                    } catch (Exception $e) {
+                        $messageData['status'] = 'failed';
+                        $messageData['message'] = $e->getMessage();
+                        $messageData = mask(json_encode($messageData));
+                        send_message($messageData, $changed_socket);
+                    }
+
+                    break;
+
                 case "login":
                     $username = $received_data->username;
                     $password = $received_data->password;
@@ -57,19 +80,23 @@ while (true) {
 
                     try {
                         $player = new Player($db, $username, $password);
+                        $player->login($username, $password);
                         $playerSessionID = uniqid();
                         $player->setSessionID($playerSessionID);
                         $player->setSocket($changed_socket);
-                        $players[$username] = $player;
                         $messageData['status'] = 'success';
                         $messageData['player'] = $player;
                         $messageData = mask(json_encode($messageData));
+
+                        $players[$username] = $player;
+
                         send_message($messageData, $changed_socket);
                     } catch (Exception $e) {
                         $messageData['status'] = 'failed';
+                        $messageData['message'] = $e->getMessage();
                         $messageData = mask(json_encode($messageData));
                         // $player->__destruct();
-                        send_message($messageData);
+                        send_message($messageData, $changed_socket);
                         break;
                     }
 
@@ -92,10 +119,21 @@ while (true) {
         if ($buf === false) {
             // Remove client for socket array
             $found_socket = array_search($changed_socket, $clients);
+            $p;
+            foreach ($players as $player) {
+                if ($player->getSocket() === $changed_socket) {
+                    $p = $player;
+                    unset($players[$player->username]);
+                }
+            }
+
             socket_getpeername($changed_socket, $ip);
+
             unset($clients[$found_socket]);
-            $response = mask(json_encode(array('type' => 'system', 'message' => $ip . ' disconnected')));
+            $response = mask(json_encode(array('type' => 'logout', 'message' => $ip . ' disconnected', 'player' => $p)));
+            print("Client " . $ip . " disconnected\n");
             send_message($response, $changed_socket);
+            broadcast_message($response);
         }
 
     }
@@ -104,10 +142,25 @@ while (true) {
 // Function to send message to all connected WebSocket clients
 function broadcast_message($msg)
 {
-    global $clients;
-    echo "wjat";
-    foreach ($clients as $changed_socket) {
-        @socket_write($changed_socket, $msg, strlen($msg));
+    global $players;
+    foreach ($players as $player) {
+        @socket_write($player->getSocket(), $msg, strlen($msg));
+    }
+    return true;
+}
+
+function broadcast_player_locations()
+{
+    global $players;
+    // var_dump($players);
+    $msg = array("type" => "players", "players" => array_values($players), "playerCount" => count($players));
+
+    // print(count($players));
+    // print("\n");
+
+    $msg = mask(json_encode($msg));
+    foreach ($players as $player) {
+        @socket_write($player->getSocket(), $msg, strlen($msg));
     }
     return true;
 }

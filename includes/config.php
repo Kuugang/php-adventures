@@ -1,17 +1,18 @@
 <?php
-$db_user = "postgres";
-$db_password = "root";
-$db_name = "dbCRUDProject";
+$db_user = "root";
+$db_password = "";
+$db_name = "dbPHPAdventures";
 $host = "localhost";
-$db_port = "5432";
+$db_port = "3306";
 
 try {
-    $db = new PDO("pgsql:host=$host;dbname=$db_name;port=$db_port", $db_user, $db_password);
+    $db = new PDO("mysql:host=$host;dbname=$db_name;port=$db_port", $db_user, $db_password);
+
 
     $createUserTable = "CREATE TABLE IF NOT EXISTS tblPlayer(
         id SERIAL PRIMARY KEY,
-        username VARCHAR(255),
-        password VARCHAR(255),
+        username VARCHAR(255) NOT NULL,
+        password VARCHAR(255) NOT NULL,
         posX int DEFAULT 0,
         posY int DEFAULT 0,
         CONSTRAINT unique_username UNIQUE (username),

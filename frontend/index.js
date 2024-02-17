@@ -10,24 +10,52 @@ webSocket.onopen = function (event) {
 };
 
 webSocket.onmessage = function (event) {
-    console.log(event.data);
     let data = JSON.parse(event.data);
-    console.log(data);
 
-    if (data.type == "login") {
-        sessionID = data.player.sessionID;
-        username = data.player.username;
-        players.push(data.player);
-        createPlayerSquare(data.player);
-    }
-
-    if (data.type == "move") {
-        players.forEach((player) => {
-            if (player.username == data.player.username) {
-                player.posX = data.player.posX;
-                player.posY = data.player.posY;
+    switch (data.type) {
+        case "login":
+            sessionID = data.player.sessionID;
+            if (data.status == "success") {
+                username = data.player.username;
+                players.push(data.player);
+                createPlayerSquare(data.player);
             }
-        })
+            break;
+        case "move":
+            players.forEach((player) => {
+                if (player.username == data.player.username) {
+                    player.posX = data.player.posX;
+                    player.posY = data.player.posY;
+                }
+            })
+
+            break;
+
+        case "players":
+            data.players.forEach(player => {
+                let p = players.find(p => p.username == player.username);
+                if (!p) {
+                    createPlayerSquare(player);
+                    players.push(player);
+                    p = player;
+                }
+                p.posX = player.posX;
+                p.posY = player.posY;
+            });
+
+            players = players.filter(player => {
+                const foundPlayer = data.players.find(p => p.username === player.username);
+                if (foundPlayer === undefined) {
+                    const playerSquare = document.getElementById(player.username);
+                    playerSquare.remove();
+                }
+                return foundPlayer;
+            });
+
+            break;
+
+        default:
+            break;
     }
 };
 
@@ -54,6 +82,21 @@ document.querySelector("#loginForm").addEventListener("submit", function (e) {
 
     webSocket.send(JSON.stringify(data));
 })
+
+document.querySelector("#registerForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    let username = document.querySelector("#registerUsername").value;
+    let password = document.querySelector("#registerPassword").value;
+
+    var data = {
+        "type": "register",
+        "username": username,
+        "password": password,
+    };
+
+    webSocket.send(JSON.stringify(data));
+})
+
 
 
 document.addEventListener("keypress", function (e) {
@@ -107,6 +150,11 @@ function createPlayerSquare(player) {
     square.style.left = player.x + 'px';
     square.style.top = player.y + 'px';
     square.id = player.username;
+
+    var p = document.createElement('p');
+    p.innerText = player.username;
+    square.appendChild(p);
+
     document.getElementById('gameContainer').appendChild(square);
 }
 

@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .playerSquare {
             position: absolute;
@@ -17,11 +18,11 @@
 
 
 <body>
-    <div id="gameContainer"></div>
+    <!-- <div id="gameContainer"></div>
     <h1>Register</h1>
     <form id="registerForm" action="">
-        <input id="username" type="text">
-        <input id="password" type="text">
+        <input id="registerUsername" type="text">
+        <input id="registerPassword" type="text">
         <button type="submit">Register</button>
     </form>
 
@@ -45,80 +46,15 @@
 
 
     <button id="logout">Logout</button>
-    <script src="index.js"></script>
+ -->
 
-    <script>
-        // let authorization;
+    <script src='https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js'></script>
+    <script src="./classes.js"></script>
+    <script src="./script.js"></script>
 
-        // document.querySelector("#registerForm").addEventListener("submit", function (e) {
-        //     e.preventDefault();
-        //     let username = document.querySelector("#username").value;
-        //     let password = document.querySelector("#password").value;
+    <!-- <script src="index.js"></script> -->
 
-        //     let data = new FormData();
-        //     data.append('username', username);
-        //     data.append('password', password);
 
-        //     fetch(`http://localhost:6969/api/user/register.php`, {
-        //         method: 'POST',
-        //         body: data,
-        //     })
-        //         .then(response => response.json())
-        //         .then(data => console.log(data))
-        //         .catch(err => console.error(err));
-        // })
-
-        // document.querySelector("#loginForm").addEventListener("submit", function (e) {
-        //     e.preventDefault();
-        //     let username = document.querySelector("#loginUsername").value;
-        //     let password = document.querySelector("#loginPassword").value;
-
-        //     let data = new FormData();
-        //     data.append('username', username);
-        //     data.append('password', password);
-
-        //     fetch('http://localhost:6969/api/user/login.php', {
-        //         method: 'POST',
-        //         body: data,
-        //     })
-        //         .then(response => response.json())
-        //         .then(data => {
-        //             console.log(data);
-        //             authorization = data['sessionID'];
-        //             console.log(authorization);
-        //         })
-        //         .catch(error => console.error('Error:', error));
-        // })
-
-        // document.querySelector("#updateProfileForm").addEventListener("submit", function (e) {
-        //     e.preventDefault();
-        //     let newPassword = document.querySelector("#newPassword").value;
-
-        //     let data = new FormData();
-        //     data.append('newPassword', newPassword);
-
-        //     fetch(`http://localhost:6969/api/user/update.php`, {
-        //         method: 'POST',
-        //         body: data,
-        //         headers: {
-        //             'Authorization': `Bearer ${authorization}`,
-        //             'Content-Type': 'application/json'
-        //         },
-        //     })
-        //         .then(response => response.json())
-        //         .then(data => console.log(data))
-        //         .catch(err => console.error(err));
-        // })
-
-        // document.querySelector("#logout").addEventListener("click", function () {
-        //     fetch("https://localhost:6969/api/user/logout.php", {
-        //         method: 'POST',
-        //     })
-        //         .then(response => response.json())
-        //         .then(data => console.log(data))
-        //         .catch(error => console.error('Error:', error));
-        // })
-    </script>
 </body>
 
 </html>

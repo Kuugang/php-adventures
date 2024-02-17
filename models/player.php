@@ -5,17 +5,14 @@ class Player
     private $table = 'tblPlayer';
     public $id;
     public $username;
-    public $posX = 0;
-    public $posY = 0;
+    public $posX = 352;
+    public $posY = 1216;
 
     private Socket $socket;
     public $sessionID;
     public function __construct($db, $username, $password)
     {
         $this->conn = $db;
-        if (!$this->login($username, $password)) {
-            throw new Exception("Login failed");
-        }
     }
 
     public function getUser($name)
@@ -55,41 +52,42 @@ class Player
 
     public function register($username, $password)
     {
-        $query = 'INSERT INTO ' . $this->table . ' (username, password) VALUES (:username, :password)';
-        $stmt = $this->conn->prepare($query);
+        try {
 
-        $this->username = htmlspecialchars(strip_tags($username));
-        $password = htmlspecialchars(strip_tags(password_hash($password, PASSWORD_DEFAULT)));
+            $query = 'INSERT INTO ' . $this->table . ' (username, password) VALUES (:username, :password)';
+            $stmt = $this->conn->prepare($query);
+            $this->username = htmlspecialchars(strip_tags($username));
+            $password = htmlspecialchars(strip_tags(password_hash($password, PASSWORD_DEFAULT)));
+            $stmt->bindParam(':username', $this->username);
+            $stmt->bindParam(':password', $password);
 
-        $stmt->bindParam(':username', $this->username);
-        $stmt->bindParam(':password', $this->password);
-
-        if ($stmt->execute())
-            return true;
+            if ($stmt->execute())
+                return true;
+        } catch (PDOException $e) {
+            throw new Exception($e->getMessage());
+        }
     }
 
     public function login($username, $password)
     {
-        $query = "SELECT * FROM " . $this->table . " WHERE username = :username";
-        $stmt = $this->conn->prepare($query);
+        try {
+            $query = "SELECT * FROM " . $this->table . " WHERE username = :username";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':username', $username);
+            $stmt->execute();
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        $stmt->bindParam(':username', $username);
-        $stmt->execute();
-
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if ($user) {
-            if (password_verify($password, $user['password'])) {
-                $this->username = $user['username'];
-                $this->posX = $user['posx'];
-                $this->posY = $user['posy'];
-
-                return true;
-            } else {
-                return false;
+            if (!$user) {
+                throw new Exception("User not found");
             }
-        } else {
-            return false;
+
+            password_verify($password, $user['password']);
+            $this->id = $user['id'];
+            $this->username = $user['username'];
+            $this->posX = $user['posX'];
+            $this->posY = $user['posY'];
+        } catch (PDOException $e) {
+            throw new Exception($e->getMessage());
         }
     }
 
@@ -114,6 +112,7 @@ class Player
             return;
         switch ($data->type) {
             case "move":
+                echo "what";
                 $this->posX += $data->x;
                 $this->posY += $data->y;
                 echo "X: $this->posX Y: $this->posY\n";
