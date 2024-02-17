@@ -5,10 +5,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <style>
+        .playerSquare {
+            position: absolute;
+            background-color: red;
+            width: 50px;
+            height: 50px;
+        }
+    </style>
 </head>
 
 
 <body>
+    <div id="gameContainer"></div>
     <h1>Register</h1>
     <form id="registerForm" action="">
         <input id="username" type="text">
@@ -36,78 +45,79 @@
 
 
     <button id="logout">Logout</button>
+    <script src="index.js"></script>
 
     <script>
-        let authorization;
+        // let authorization;
 
-        document.querySelector("#registerForm").addEventListener("submit", function (e) {
-            e.preventDefault();
-            let username = document.querySelector("#username").value;
-            let password = document.querySelector("#password").value;
+        // document.querySelector("#registerForm").addEventListener("submit", function (e) {
+        //     e.preventDefault();
+        //     let username = document.querySelector("#username").value;
+        //     let password = document.querySelector("#password").value;
 
-            let data = new FormData();
-            data.append('username', username);
-            data.append('password', password);
+        //     let data = new FormData();
+        //     data.append('username', username);
+        //     data.append('password', password);
 
-            fetch(`http://localhost:6969/api/user/register.php`, {
-                method: 'POST',
-                body: data,
-            })
-                .then(response => response.json())
-                .then(data => console.log(data))
-                .catch(err => console.error(err));
-        })
+        //     fetch(`http://localhost:6969/api/user/register.php`, {
+        //         method: 'POST',
+        //         body: data,
+        //     })
+        //         .then(response => response.json())
+        //         .then(data => console.log(data))
+        //         .catch(err => console.error(err));
+        // })
 
-        document.querySelector("#loginForm").addEventListener("submit", function (e) {
-            e.preventDefault();
-            let username = document.querySelector("#loginUsername").value;
-            let password = document.querySelector("#loginPassword").value;
+        // document.querySelector("#loginForm").addEventListener("submit", function (e) {
+        //     e.preventDefault();
+        //     let username = document.querySelector("#loginUsername").value;
+        //     let password = document.querySelector("#loginPassword").value;
 
-            let data = new FormData();
-            data.append('username', username);
-            data.append('password', password);
+        //     let data = new FormData();
+        //     data.append('username', username);
+        //     data.append('password', password);
 
-            fetch('http://localhost:6969/api/user/login.php', {
-                method: 'POST',
-                body: data,
-            })
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data);
-                    authorization = data['sessionID'];
-                    console.log(authorization);
-                })
-                .catch(error => console.error('Error:', error));
-        })
+        //     fetch('http://localhost:6969/api/user/login.php', {
+        //         method: 'POST',
+        //         body: data,
+        //     })
+        //         .then(response => response.json())
+        //         .then(data => {
+        //             console.log(data);
+        //             authorization = data['sessionID'];
+        //             console.log(authorization);
+        //         })
+        //         .catch(error => console.error('Error:', error));
+        // })
 
-        document.querySelector("#updateProfileForm").addEventListener("submit", function (e) {
-            e.preventDefault();
-            let newPassword = document.querySelector("#newPassword").value;
+        // document.querySelector("#updateProfileForm").addEventListener("submit", function (e) {
+        //     e.preventDefault();
+        //     let newPassword = document.querySelector("#newPassword").value;
 
-            let data = new FormData();
-            data.append('newPassword', newPassword);
+        //     let data = new FormData();
+        //     data.append('newPassword', newPassword);
 
-            fetch(`http://localhost:6969/api/user/update.php`, {
-                method: 'POST',
-                body: data,
-                headers: {
-                    'Authorization': `Bearer ${authorization}`,
-                    'Content-Type': 'application/json'
-                },
-            })
-                .then(response => response.json())
-                .then(data => console.log(data))
-                .catch(err => console.error(err));
-        })
+        //     fetch(`http://localhost:6969/api/user/update.php`, {
+        //         method: 'POST',
+        //         body: data,
+        //         headers: {
+        //             'Authorization': `Bearer ${authorization}`,
+        //             'Content-Type': 'application/json'
+        //         },
+        //     })
+        //         .then(response => response.json())
+        //         .then(data => console.log(data))
+        //         .catch(err => console.error(err));
+        // })
 
-        document.querySelector("#logout").addEventListener("click", function () {
-            fetch("https://localhost:6969/api/user/logout.php", {
-                method: 'POST',
-            })
-                .then(response => response.json())
-                .then(data => console.log(data))
-                .catch(error => console.error('Error:', error));
-        })
+        // document.querySelector("#logout").addEventListener("click", function () {
+        //     fetch("https://localhost:6969/api/user/logout.php", {
+        //         method: 'POST',
+        //     })
+        //         .then(response => response.json())
+        //         .then(data => console.log(data))
+        //         .catch(error => console.error('Error:', error));
+        // })
     </script>
 </body>
 
