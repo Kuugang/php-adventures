@@ -46,6 +46,7 @@ class Player {
 
         // Stop any previous movement from the last frame
         this.sprite.body.setVelocity(0);
+        // console.log(prevVelocity);
 
         // Horizontal movement
         if (cursors.left.isDown) {
@@ -66,30 +67,13 @@ class Player {
 
         // Update the animation last and give left/right animations precedence over up/down animations
 
-        var data = {
-            "type": "move",
-            "username": this.username,
-            "sessionID": this.sessionID,
-            "x": 0,
-            "y": 0
-        };
-
-
         if (cursors.left.isDown) {
-            data.x -= 1;
-            this.socket.send(JSON.stringify(data));
             this.sprite.anims.play("misa-left-walk", true);
         } else if (cursors.right.isDown) {
-            data.x += 1;
-            this.socket.send(JSON.stringify(data));
             this.sprite.anims.play("misa-right-walk", true);
         } else if (cursors.up.isDown) {
-            data.y -= 1;
-            this.socket.send(JSON.stringify(data));
             this.sprite.anims.play("misa-back-walk", true);
         } else if (cursors.down.isDown) {
-            data.y += 1;
-            this.socket.send(JSON.stringify(data));
             this.sprite.anims.play("misa-front-walk", true);
         } else {
             this.sprite.anims.stop();
@@ -100,23 +84,18 @@ class Player {
                     if (prevVelocity.y < 0) this.sprite.setTexture("atlas", "misa-back"); else
                         if (prevVelocity.y > 0) this.sprite.setTexture("atlas", "misa-front");
         }
-    }
 
-    playAnimations() {
-        // const { left, right, up, down } = this.cursors;
+        var data = {
+            "type": "move",
+            "username": this.username,
+            "sessionID": this.sessionID,
+            "x": this.sprite.x,
+            "y": this.sprite.y,
+            "velocity": this.sprite.body.velocity,
+            "prevVelocity": prevVelocity
+        };
+        this.socket.send(JSON.stringify(data));
 
-        // if (left.isDown) {
-        //     this.sprite.anims.play("left-walk", true);
-        // } else if (right.isDown) {
-        //     this.sprite.anims.play("right-walk", true);
-        // } else if (up.isDown) {
-        //     this.sprite.anims.play("back-walk", true);
-        // } else if (down.isDown) {
-        //     this.sprite.anims.play("front-walk", true);
-        // } else {
-        //     this.sprite.anims.stop();
-        //     // Set idle frame based on previous velocity
-        // }
     }
 }
 

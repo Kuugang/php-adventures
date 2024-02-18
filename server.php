@@ -47,7 +47,7 @@ while (true) {
             $received_text = unmask($buf);
             $received_data = json_decode($received_text);
 
-            print($received_data->type);
+            // print($received_data->type);
 
             if ($received_data === null)
                 continue;

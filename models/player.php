@@ -7,9 +7,11 @@ class Player
     public $username;
     public $posX = 352;
     public $posY = 1216;
-
+    public $velocity;
+    public $prevVelocity;
     private Socket $socket;
     public $sessionID;
+
     public function __construct($db, $username, $password)
     {
         $this->conn = $db;
@@ -112,10 +114,12 @@ class Player
             return;
         switch ($data->type) {
             case "move":
-                echo "what";
-                $this->posX += $data->x;
-                $this->posY += $data->y;
-                echo "X: $this->posX Y: $this->posY\n";
+                $this->posX = $data->x;
+                $this->posY = $data->y;
+
+                $this->velocity = $data->velocity;
+                $this->prevVelocity = $data->prevVelocity;
+
                 $messageData = array('type' => 'move', 'player' => $this);
                 $messageData = mask(json_encode($messageData));
                 send_message($messageData, $this->socket);
