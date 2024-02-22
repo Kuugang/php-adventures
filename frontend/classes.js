@@ -35,9 +35,7 @@ class Player {
     }
 
     #openSayInput() {
-        // Ensure only one input exists at a time
         if (!this.sayInput) {
-            // Create and display the input field
             this.sayInput = document.createElement('input');
             this.sayInput.type = 'text';
             this.sayInput.placeholder = 'Say something...';
@@ -50,7 +48,6 @@ class Player {
     }
 
     #sendMessage() {
-        // Ensure input exists and contains a message
         if (this.sayInput && this.sayInput.value.trim() !== '') {
             const message = this.sayInput.value.trim();
             const data = {
@@ -162,9 +159,10 @@ class Player {
             "velocity": this.sprite.body.velocity,
             "prevVelocity": prevVelocity
         };
-        console.log(data);
         this.socket.send(JSON.stringify(data));
     }
+
+
 
 
     #showDialogue(message) {
@@ -272,5 +270,10 @@ class OtherPlayer {
                     if (playerData.prevVelocity.y < 0) this.sprite.setTexture("atlas", "misa-back"); else
                         if (playerData.prevVelocity.y > 0) this.sprite.setTexture("atlas", "misa-front");
         }
+    }
+
+    destroy() {
+        this.sprite.destroy();
+        this.playerUsernameDialogue.destroy();
     }
 }

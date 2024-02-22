@@ -90,24 +90,15 @@ class MainGameScene extends Phaser.Scene {
                         } else {
                             existingPlayer.update(playerData);
                         }
-
-                        // if (playerData.sayMessages.length > 0) {
-                        //     existingPlayer.showDialogue(playerData.sayMessages[0]);
-                        // }
-
-
-                        // console.log(prevVelocity);
-
-
                     });
 
-                    // scene.players = scene.players.filter(player => {
-                    //     const foundPlayer = data.players.find(p => p.username === player.username);
-                    //     if (!foundPlayer) {
-                    //         player.sprite.destroy();
-                    //     }
-                    //     return foundPlayer;
-                    // });
+                    scene.otherPlayers = scene.otherPlayers.filter(player => {
+                        const foundPlayer = data.players.find(p => p.username === player.username);
+                        if (!foundPlayer) {
+                            player.destroy();
+                        }
+                        return foundPlayer;
+                    });
                     break;
             }
         };
