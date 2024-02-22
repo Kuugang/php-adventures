@@ -12,7 +12,7 @@ class MainGameScene extends Phaser.Scene {
         super({ key: 'MainGameScene' });
         this.worldLayer;
         this.spawnPoint;
-        this.players = [];
+        this.otherPlayers = [];
     }
 
     preload() {
@@ -32,8 +32,11 @@ class MainGameScene extends Phaser.Scene {
         this.spawnPoint = map.findObject("Objects", obj => obj.name === "Spawn Point");
 
         // Declare player within the scope of MainGameScene
-        player = new Player(this, this.worldLayer, this.spawnPoint.x, this.spawnPoint.y, "atlas", "misa-front", webSocket, sessionID);
-        player.username = playerUsername;
+
+        player = new Player(this, this.spawnPoint.x, this.spawnPoint.y, playerUsername);
+        player.initializeInputs();
+        player.setSocket(webSocket);
+
         // this.players.push(player);
 
         const camera = this.cameras.main;
@@ -41,12 +44,12 @@ class MainGameScene extends Phaser.Scene {
         camera.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
         cursors = this.input.keyboard.createCursorKeys();
 
-        this.add.text(16, 16, 'Arrow keys to move\nPress "D" to show hitboxes', {
-            font: "18px monospace",
-            fill: "#000000",
-            padding: { x: 20, y: 10 },
-            backgroundColor: "#ffffff"
-        }).setScrollFactor(0).setDepth(30);
+        // this.add.text(16, 16, 'Arrow keys to move\nPress "D" to show hitboxes', {
+        //     font: "18px monospace",
+        //     fill: "#000000",
+        //     padding: { x: 20, y: 10 },
+        //     backgroundColor: "#ffffff"
+        // }).setScrollFactor(0).setDepth(30);
 
 
 
@@ -63,9 +66,8 @@ class MainGameScene extends Phaser.Scene {
     }
 
 
-
     update(time, delta) {
-        player.updatePlayer();
+        player.update();
 
         const scene = this;
 
@@ -74,39 +76,28 @@ class MainGameScene extends Phaser.Scene {
 
             switch (data.type) {
                 case "players":
-                    // console.log(data.players);
                     data.players.forEach(playerData => {
                         if (playerData.username == playerUsername) return;
-                        let existingPlayer = scene.players.find(p => p.username === playerData.username);
+                        let existingPlayer = scene.otherPlayers.find(p => p.username === playerData.username);
 
+                        // if (playerData.sayMessages.length > 0) {
+                        //     existingPlayer.showDialogue(playerData.sayMessages[0].message);
+                        // }
 
                         if (!existingPlayer) {
-                            let newPlayer = new Player(scene, scene.worldLayer, playerData.posX, playerData.posY, "atlas", "misa-front", webSocket, data.sessionID);
-                            newPlayer.username = playerData.username;
-                            scene.players.push(newPlayer);
-                            return;
+                            let newPlayer = new OtherPlayer(scene, playerData);
+                            scene.otherPlayers.push(newPlayer);
                         } else {
-                            existingPlayer.sprite.x = playerData.posX;
-                            existingPlayer.sprite.y = playerData.posY;
+                            existingPlayer.update(playerData);
                         }
 
+                        // if (playerData.sayMessages.length > 0) {
+                        //     existingPlayer.showDialogue(playerData.sayMessages[0]);
+                        // }
+
+
                         // console.log(prevVelocity);
-                        if (playerData.velocity.x < 0) {
-                            existingPlayer.sprite.anims.play("misa-left-walk", true);
-                        } else if (playerData.velocity.x > 0) {
-                            existingPlayer.sprite.anims.play("misa-right-walk", true);
-                        } else if (playerData.velocity.y < 0) {
-                            existingPlayer.sprite.anims.play("misa-back-walk", true);
-                        } else if (playerData.velocity.y > 0) {
-                            existingPlayer.sprite.anims.play("misa-front-walk", true);
-                        } else {
-                            // If the player is not moving, stop the animation
-                            existingPlayer.sprite.anims.stop();
-                            if (playerData.prevVelocity.x < 0) existingPlayer.sprite.setTexture("atlas", "misa-left"); else
-                                if (playerData.prevVelocity.x > 0) existingPlayer.sprite.setTexture("atlas", "misa-right"); else
-                                    if (playerData.prevVelocity.y < 0) existingPlayer.sprite.setTexture("atlas", "misa-back"); else
-                                        if (playerData.prevVelocity.y > 0) existingPlayer.sprite.setTexture("atlas", "misa-front");
-                        }
+
 
                     });
 

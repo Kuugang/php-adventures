@@ -11,7 +11,7 @@ class Player
     public $prevVelocity;
     private Socket $socket;
     public $sessionID;
-
+    public $sayMessages = array();
     public function __construct($db, $username, $password)
     {
         $this->conn = $db;
@@ -108,8 +108,17 @@ class Player
         $this->socket = $socket;
     }
 
+
     public function update($data)
     {
+        $currentTime = time();
+
+        foreach ($this->sayMessages as &$message) {
+            if (($currentTime - $message['timestamp']) > 10) {
+                unset($message);
+            }
+        }
+
         if (!isset($data->type))
             return;
         switch ($data->type) {
@@ -125,6 +134,14 @@ class Player
                 send_message($messageData, $this->socket);
                 break;
 
+            case "sayMessage":
+                print($data->message);
+                $messageData = array(
+                    "message" => $data->message,
+                    "timestamp" => time(),
+                );
+                array_push($this->sayMessages, $messageData);
+                break;
             default:
                 break;
         }

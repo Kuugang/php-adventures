@@ -95,7 +95,6 @@ while (true) {
                         $messageData['status'] = 'failed';
                         $messageData['message'] = $e->getMessage();
                         $messageData = mask(json_encode($messageData));
-                        // $player->__destruct();
                         send_message($messageData, $changed_socket);
                         break;
                     }
@@ -161,7 +160,9 @@ function broadcast_player_locations()
     $msg = mask(json_encode($msg));
     foreach ($players as $player) {
         @socket_write($player->getSocket(), $msg, strlen($msg));
+
     }
+
     return true;
 }
 
